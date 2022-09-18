@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-
 import requests
 import json
 import os
 from datetime import date
+from src.utils import get_mappings
 import pandas as pd
+
+MAP = get_mappings()
 
 class DeGiroWrapper:
     
@@ -19,11 +16,13 @@ class DeGiroWrapper:
     PORTFOLIO_URL = 'https://trader.degiro.nl/reporting/secure/v3/positionReport/xls'
     TRANSACTIONS_URL = 'https://trader.degiro.nl/reporting/secure/v4/transactions'
     ACC_OVERVIEW_URL = 'https://trader.degiro.nl/reporting/secure/v6/accountoverview'
+    ETF_SEARCH_URL = 'https://trader.degiro.nl/product_search/secure/v5/etfs'
     LOOKUP_URL = 'https://trader.degiro.nl/product_search/secure/v5/products/lookup'
     PRODUCT_INFO_URL = 'https://trader.degiro.nl/product_search/secure/v5/products/info'
-    PRICE_DATA_URL = 'https://charting.vwdservices.com/hchart/v1/deGiro/data.js'
+    ETF_URL = 'https://trader.degiro.nl/product_search/secure/v5/etfs'
+    PRICE_DATA_URL = 'https://charting.vwdservices.com/hchart/v1/deGiro/data.js'    
     CREDENTIALS_FILE = 'credentials.json'
-    SESSION_CACHE = '__pycache__/session.json'
+    SESSION_CACHE = '__pycache__/session'
 
     def __init__(self, cache_credentials=False, cache_session=False):
         self.cache_credentials = cache_credentials
@@ -37,7 +36,9 @@ class DeGiroWrapper:
             response = method(self, url, **kwargs)
             if response.status_code==401:
                 print('Your session has expired. Logging in again...')
+                if self.cache_session: os.remove(self.SESSION_CACHE)
                 self._get_session_data()
+                kwargs['params'].update(**self.session)
                 return method(self, url, **kwargs)
             else:
                 return response
@@ -71,6 +72,15 @@ class DeGiroWrapper:
         with open(self.CREDENTIALS_FILE, "w") as outfile:
             json.dump(credentials, outfile) 
 
+    def _mfa(self, credentials):
+        one_time_code = input('Enter 2FA code:')
+        credentials['oneTimePassword'] = one_time_code
+        response = self._post(self.TFA_URL, json=credentials).json()
+        if response['status']==3:
+            print('2FA code is invalid. Try again...')
+            return self._mfa(credentials)
+        return response
+
     def _login(self):
         credentials = self.get_credentials()
         response = self._post(self.LOGIN_URL, json=credentials).json()
@@ -79,9 +89,7 @@ class DeGiroWrapper:
             os.remove('credentials.json')
             return self._login()
         elif response['status']==6: # 2FA enabled
-            one_time_code = input('Enter 2FA code:')
-            credentials['oneTimePassword'] = one_time_code
-            response = self._post(self.TFA_URL, json=credentials).json()
+            response = self._mfa(credentials)
             return response
         else:
             return response
@@ -100,24 +108,29 @@ class DeGiroWrapper:
 
     def _cache_session(self, session):
         with open(self.SESSION_CACHE, "w") as outfile:
-            json.dump(session, outfile) 
+            outfile.write(session) 
 
     def _load_session(self):
         "Load credentials from store file"
         with open(self.SESSION_CACHE, "r") as infile:
-            session = json.loads(infile.read())
-        self.session = session   
+            session = infile.read()
+        return session   
 
-    def _get_session_data(self):
+    def _get_session_id(self):
         if self.cache_session and os.path.isfile(self.SESSION_CACHE):
-            self._load_session()
+            session_id = self._load_session()
         else:
             response = self._login()
-            self.session_id = response['sessionId']
-            sess_id = {'sessionId': self.session_id}
-            client_info = self._get(self.CLIENT_INFO_URL, params=sess_id).json()['data']        
-            self.session = {'sessionId': self.session_id, 'intAccount': client_info['intAccount']}
-            if self.cache_session: self._cache_session(self.session)
+            session_id = response['sessionId']
+            if self.cache_session: self._cache_session(session_id)
+        return session_id
+
+    def _get_session_data(self):
+        session_id = self._get_session_id()
+        sess_id = {'sessionId': session_id}
+        self.client_info = self._get(self.CLIENT_INFO_URL, params=sess_id).json()['data']        
+        self.session = {'sessionId': session_id, 
+                        'intAccount': self.client_info['intAccount']}
 
     def get_current_portfolio(self, also_closed=False):
         """ Get current portfolio holdings.
@@ -191,7 +204,7 @@ class DeGiroWrapper:
         df['date'] = pd.to_datetime(df.date, utc=True)
         return df
     
-    def _lookup(self, text: str, limit: int=10, ETF=False)-> dict:
+    def _lookup(self, text: str, limit: int=10)-> dict:
         """ Srearch a product using text.
             Inputs:
                 text: (str) could be identifier or name
@@ -200,7 +213,6 @@ class DeGiroWrapper:
                 out: (dict)
         """
         params = {**self.session, 'searchText': text, 'limit': limit}
-        if ETF: params['productTypeId'] = 131
         response = self._get(self.LOOKUP_URL, params=params)
         out = response.json()['products']
         return out
@@ -240,3 +252,13 @@ class DeGiroWrapper:
                  }
         response = self._get(self.PRICE_DATA_URL, params=params)
         return response.json()
+
+    def search_etfs(self, text:str=None, only_free:bool=False, limit: int=25):
+        params = {**self.session, 'limit': limit}
+        if only_free: 
+            params['etfFeeTypeId'] = 2
+        if text:
+            params['searchText'] = text
+        response = self._get(self.ETF_URL, params=params)
+        return response.json()['products']
+

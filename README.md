@@ -1,0 +1,2 @@
+# Intro
+ This is a DeGiro analytics platform. DeGiro is a low fee Dutch investment broker, which is, unfortunately, offers a limited account analytics capabilities. This project leverages DeGiro's private API and provides some perfomance analytics tools.ß

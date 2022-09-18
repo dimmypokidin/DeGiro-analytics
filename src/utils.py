@@ -1,4 +1,6 @@
 import pandas as pd
+import requests
+from io import BytesIO
 from datetime import datetime
 
 def process_price_history(data: dict) -> pd.DataFrame:
@@ -52,3 +54,11 @@ def analytics(prices):
     out['T'] = len(prices)
     return out
 
+def get_core_selection_etf():
+    response = requests.get('https://www.degiro.nl/assets/js/data/core-selection-list-nl.csv')
+    df = pd.read_csv(BytesIO(df.content))
+    return df
+
+def get_mappings():
+    response = requests.get('https://trader.degiro.nl/product_search/config/dictionary/')
+    return response.json()
