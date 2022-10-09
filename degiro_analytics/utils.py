@@ -2,7 +2,6 @@ import pandas as pd
 import requests
 from io import BytesIO
 from datetime import datetime
-from collections import defaultdict
 
 def process_price_history(data: dict) -> pd.DataFrame:
     resolution = data['resolution']

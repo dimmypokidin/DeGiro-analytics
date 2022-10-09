@@ -1,0 +1,1 @@
+from degiro_analytics.DeGiroWrapper import DeGiroWrapper

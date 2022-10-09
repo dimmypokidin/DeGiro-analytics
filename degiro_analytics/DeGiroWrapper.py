@@ -2,7 +2,7 @@ import requests
 import json
 import os
 from datetime import date
-from src.utils import process_price_history, products_to_df, products_to_prices_df, overview_to_df
+from degiro_analytics.utils import process_price_history, products_to_df, products_to_prices_df, overview_to_df
 import pandas as pd
 class DeGiroWrapper:
     
