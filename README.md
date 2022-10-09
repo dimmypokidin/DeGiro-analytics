@@ -1,18 +1,17 @@
 # Intro
- This is a DeGiro analytics platform. DeGiro is a low fee Dutch investment broker, which, unfortunately, offers a limited account analytics capabilities. This project leverages DeGiro's private API and provides some investment perfomance analytics tools.
+ This is a DeGiro analytics platform. DeGiro is a low-fee Dutch investment broker that, sadly, offers limited account analytics functionality. This project leverages DeGiro's private API and provides some investment performance analytics tools.
 
-# Instalation
+# Installation
 
 `pip install degiro_analytics`
 
 # Requirments
 
- The project is built in `conda 4.12.0` environmnet.  
+ The project is built in `conda 4.12.0` environment.  
  # Description
  
- `degiro_analytics/DegiroWrapper.py` contains API to retrieve current portfolio information and product saearch. It does not contain trading API. There are open source projects implementing trading API. 
+ `degiro_analytics/DegiroWrapper.py` contains API to retrieve current portfolio information and product search. It does not include trading API. There are open-source projects implementing trading API. 
 
-`degiro_analytics/utils.py` contains various methods for portfolio analytics
+`degiro_analytics/utils.py` contains various methods for portfolio analytics.
 
 `Examples.ipynb` Refer to this Jupyter Notebook for examples.
- 
