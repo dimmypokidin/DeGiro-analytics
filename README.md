@@ -7,7 +7,8 @@
 
 # Requirments
 
- The project is built in `conda 4.12.0` environment.  
+ `pandas>=1.4.2`
+`requests>=2.27.1`
  # Description
  
  `degiro_analytics/DegiroWrapper.py` contains API to retrieve current portfolio information and product search. It does not include trading API. There are open-source projects implementing trading API. 
