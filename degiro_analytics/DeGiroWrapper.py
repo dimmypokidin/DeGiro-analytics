@@ -114,6 +114,8 @@ class DeGiroWrapper:
             return credentials 
 
     def __cache_session(self, session):
+        if not os.path.isdir('__pycache__'):
+            os.mkdir('__pycache__')
         with open(self.SESSION_CACHE, "w") as outfile:
             outfile.write(session) 
 
