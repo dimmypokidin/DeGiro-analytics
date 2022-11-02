@@ -11,7 +11,7 @@
 
 # Docker
 
- If you prefer to run the project in Docker, I made an image available in Docker hub. It contains a Jupyter Notebook with getting-started example.
+ If you prefer to run the project in Docker, I made an image available in Docker hub. It contains a Jupyter Notebook with getting-started examples.
 
  ```
  docker pull dpokidin/degiro-analytics-notebook
