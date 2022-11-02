@@ -1,21 +1,30 @@
 # Intro
  This is a DeGiro analytics platform. DeGiro is a low-fee Dutch investment broker that, sadly, offers limited account analytics functionality. This project leverages DeGiro's private API and provides some investment performance analytics tools.
 
+# Requirments
+
+`pandas>=1.4.2`
+`requests>=2.27.1`
 # Installation
 
 `pip install degiro_analytics`
 
-# Requirments
+# Docker
 
- `pandas>=1.4.2`
-`requests>=2.27.1`
+ If you prefer to run the project in Docker, I made an image available in Docker hub. It contains a Jupyter Notebook with getting-started example.
+
+ ```
+ docker pull dpokidin/degiro-analytics-notebook
+ docker run -p 8888:8888 dpokidin/degiro-analytics-notebook
+ ```
+ Just copy the link with an automatically generated token and plug it to your browser to run Jupyter. 
+ > Hint: Make sure you don't have any existing notebooks running on port 8888.
  # Description
  
  `degiro_analytics/DegiroWrapper.py` contains API to retrieve current portfolio information and product search. It does not include trading API. There are open-source projects implementing trading API. 
 
 `degiro_analytics/utils.py` contains various methods for portfolio analytics.
 
-`Examples.ipynb` Refer to this Jupyter Notebook for examples.
 
 # Examples
 
@@ -45,7 +54,7 @@ P.plot(title='Portfolio constituents perfomance', figsize=(15, 7))
 ```
 
     
-![png](img/Examples_5_1.png)
+![png](https://github.com/dimmypokidin/DeGiro-analytics/blob/master/img/Examples_5_1.png?raw=true)
     
 
 
@@ -89,7 +98,7 @@ IDX.plot(title='Account Portfolio Perfomance', figsize=(15, 7))
 ```
 
     
-![png](img/Examples_12_1.png)
+![png](https://github.com/dimmypokidin/DeGiro-analytics/blob/master/img/Examples_12_1.png?raw=true)
     
 
 
@@ -146,9 +155,8 @@ p.plot(title=product.name, figsize=(15,7))
     The current price of Microsoft Corp is 229.25 USD
 
     
-![png](img/Examples_19_2.png)
+![png](https://github.com/dimmypokidin/DeGiro-analytics/blob/master/img/Examples_19_2.png?raw=true)
     
-
 
 
 ```python
@@ -162,7 +170,7 @@ p.plot(title=product.name + ' (intraday pricing)', figsize=(15,7))
     The current price of Apple Inc is 140.42 USD
 
     
-![png](img/Examples_20_2.png)
+![png](https://github.com/dimmypokidin/DeGiro-analytics/blob/master/img/Examples_20_2.png?raw=true)
     
 
 
